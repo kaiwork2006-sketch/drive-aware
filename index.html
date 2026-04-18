@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 <head>
   <title>DriveAware</title>
@@ -7,17 +6,33 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwlPdQ7vByL3E1VlmSb3Xhq0acYuC8590"></script>
 
   <style>
-    body { margin:0; font-family:Arial; }
+    body { margin:0; font-family:Arial, sans-serif; background:#000; color:#fff; }
     #map { height:100vh; width:100%; display:none; }
-    #login { text-align:center; margin-top:100px; }
+    #login {
+      text-align:center;
+      margin-top:100px;
+    }
+    .info-box {
+      position:absolute;
+      bottom:20px;
+      left:20px;
+      z-index:5;
+      background:rgba(0,0,0,0.8);
+      color:white;
+      padding:14px;
+      border-radius:12px;
+      min-width:220px;
+      font-size:14px;
+    }
   </style>
-
 </head>
 
 <body>
 
 <div id="login">
-  <h1>DriveAware</h1>
+  <h1>🚗 DriveAware</h1>
+  <p>Login to see nearby vehicles</p>
+
   <div id="g_id_onload"
        data-client_id="858177640880-1cpig47vu2utd3rvoo1n4r2ioqto3mar.apps.googleusercontent.com"
        data-callback="handleCredentialResponse">
@@ -27,12 +42,23 @@
 </div>
 
 <div id="map"></div>
+<div class="info-box" id="infoBox" style="display:none;">
+  <div><b>Status:</b> Live</div>
+  <div><b>Range:</b> 2 km</div>
+  <div><b>Refresh:</b> 5 sec</div>
+  <div><b>Nearby cars:</b> <span id="carCount">0</span></div>
+</div>
 
 <script>
+let map;
+let userMarker;
+let radiusCircle;
+let nearbyMarkers = [];
+
 function handleCredentialResponse(response) {
   document.getElementById("login").style.display = "none";
   document.getElementById("map").style.display = "block";
-
+  document.getElementById("infoBox").style.display = "block";
   initMap();
 }
 
@@ -43,17 +69,105 @@ function initMap() {
       lng: position.coords.longitude
     };
 
-    const map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
       center: userLocation,
-      zoom: 15
+      zoom: 15,
+      styles: [
+        { elementType: "geometry", stylers: [{ color: "#111111" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#111111" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#888888" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#2a2a2a" }] },
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", stylers: [{ visibility: "off" }] }
+      ]
     });
 
-    new google.maps.Marker({
+    userMarker = new google.maps.Marker({
       position: userLocation,
       map: map,
-      title: "You"
+      title: "Your Car",
+      icon: {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 6,
+        fillColor: "#3b82f6",
+        fillOpacity: 1,
+        strokeWeight: 2,
+        strokeColor: "#ffffff",
+        rotation: 0
+      }
     });
+
+    radiusCircle = new google.maps.Circle({
+      strokeColor: "#3b82f6",
+      strokeOpacity: 0.8,
+      strokeWeight: 1,
+      fillColor: "#3b82f6",
+      fillOpacity: 0.08,
+      map: map,
+      center: userLocation,
+      radius: 2000
+    });
+
+    generateNearbyCars(userLocation);
+    setInterval(() => {
+      refreshNearbyCars(userLocation);
+    }, 5000);
   });
+}
+
+function clearNearbyCars() {
+  nearbyMarkers.forEach(marker => marker.setMap(null));
+  nearbyMarkers = [];
+}
+
+function refreshNearbyCars(userLocation) {
+  clearNearbyCars();
+  generateNearbyCars(userLocation);
+}
+
+function generateNearbyCars(userLocation) {
+  const cars = [];
+
+  for (let i = 0; i < 4; i++) {
+    const latOffset = (Math.random() - 0.5) * 0.02;
+    const lngOffset = (Math.random() - 0.5) * 0.02;
+
+    const carPosition = {
+      lat: userLocation.lat + latOffset,
+      lng: userLocation.lng + lngOffset
+    };
+
+    const speed = Math.floor(Math.random() * 50) + 30;
+    const direction = Math.floor(Math.random() * 360);
+
+    const marker = new google.maps.Marker({
+      position: carPosition,
+      map: map,
+      title: "Nearby Car",
+      icon: {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 5,
+        fillColor: "#ffffff",
+        fillOpacity: 1,
+        strokeWeight: 1,
+        strokeColor: "#000000",
+        rotation: direction
+      }
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `<b>Nearby Car</b><br>Speed: ${speed} km/h<br>Direction: ${direction}°`
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+
+    nearbyMarkers.push(marker);
+    cars.push(marker);
+  }
+
+  document.getElementById("carCount").innerText = cars.length;
 }
 </script>
 
