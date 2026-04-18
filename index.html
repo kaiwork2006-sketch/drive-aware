@@ -1,59 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>DriveAware</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwlPdQ7vByL3E1VlmSb3Xhq0acYuC8590"></script>
-
-  <style>
-    body { margin:0; font-family:Arial, sans-serif; background:#000; color:#fff; }
-    #map { height:100vh; width:100%; display:none; }
-    #login {
-      text-align:center;
-      margin-top:100px;
-    }
-    .info-box {
-      position:absolute;
-      bottom:20px;
-      left:20px;
-      z-index:5;
-      background:rgba(0,0,0,0.8);
-      color:white;
-      padding:14px;
-      border-radius:12px;
-      min-width:220px;
-      font-size:14px;
-    }
-  </style>
-</head>
-
-<body>
-
-<div id="login">
-  <h1>🚗 DriveAware</h1>
-  <p>Login to see nearby vehicles</p>
-
-  <div id="g_id_onload"
-       data-client_id="858177640880-1cpig47vu2utd3rvoo1n4r2ioqto3mar.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse">
-  </div>
-
-  <div class="g_id_signin"></div>
-</div>
-
-<div id="map"></div>
-<div class="info-box" id="infoBox" style="display:none;">
-  <div><b>Status:</b> Live</div>
-  <div><b>Range:</b> 2 km</div>
-  <div><b>Refresh:</b> 5 sec</div>
-  <div><b>Nearby cars:</b> <span id="carCount">0</span></div>
-</div>
-
 <script>
 let map;
 let userMarker;
 let radiusCircle;
 let nearbyMarkers = [];
+let fixedZoom = 15.8;
+let isResettingZoom = false;
+
+const teslaCarIcon = {
+  url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+      <g>
+        <path d="M20 18 C22 14, 42 14, 44 18 L48 28 C49 30, 49 34, 48 37 L46 46 C45.5 49, 43 51, 40 51 L24 51 C21 51, 18.5 49, 18 46 L16 37 C15 34, 15 30, 16 28 Z"
+              fill="#ffffff" stroke="#111111" stroke-width="2"/>
+        <path d="M23 22 L41 22 L45 31 L19 31 Z" fill="#1f2937"/>
+        <rect x="22" y="34" width="20" height="8" rx="3" fill="#e5e7eb"/>
+        <circle cx="22" cy="46" r="3.2" fill="#0f0f0f"/>
+        <circle cx="42" cy="46" r="3.2" fill="#0f0f0f"/>
+      </g>
+    </svg>
+  `),
+  scaledSize: new google.maps.Size(42, 42),
+  anchor: new google.maps.Point(21, 21)
+};
 
 function handleCredentialResponse(response) {
   document.getElementById("login").style.display = "none";
@@ -71,14 +39,37 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById("map"), {
       center: userLocation,
-      zoom: 15,
+      zoom: fixedZoom,
+      heading: 0,
+      tilt: 0,
+      disableDefaultUI: true,
+      zoomControl: false,
+      gestureHandling: "greedy",
+      clickableIcons: false,
+      minZoom: 15,
+      maxZoom: 17,
+      restriction: {
+        latLngBounds: {
+          north: userLocation.lat + 0.025,
+          south: userLocation.lat - 0.025,
+          east: userLocation.lng + 0.025,
+          west: userLocation.lng - 0.025
+        },
+        strictBounds: false
+      },
       styles: [
-        { elementType: "geometry", stylers: [{ color: "#111111" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#111111" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#888888" }] },
-        { featureType: "road", elementType: "geometry", stylers: [{ color: "#2a2a2a" }] },
+        { elementType: "geometry", stylers: [{ color: "#05070b" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#6b7280" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#05070b" }] },
         { featureType: "poi", stylers: [{ visibility: "off" }] },
-        { featureType: "transit", stylers: [{ visibility: "off" }] }
+        { featureType: "transit", stylers: [{ visibility: "off" }] },
+        { featureType: "administrative", stylers: [{ visibility: "off" }] },
+        { featureType: "road", elementType: "geometry", stylers: [{ color: "#1f2937" }] },
+        { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#111827" }] },
+        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#374151" }] },
+        { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#4b5563" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#030712" }] },
+        { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#05070b" }] }
       ]
     });
 
@@ -86,31 +77,45 @@ function initMap() {
       position: userLocation,
       map: map,
       title: "Your Car",
-      icon: {
-        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-        scale: 6,
-        fillColor: "#3b82f6",
-        fillOpacity: 1,
-        strokeWeight: 2,
-        strokeColor: "#ffffff",
-        rotation: 0
-      }
+      icon: teslaCarIcon
     });
 
     radiusCircle = new google.maps.Circle({
       strokeColor: "#3b82f6",
-      strokeOpacity: 0.8,
+      strokeOpacity: 0.65,
       strokeWeight: 1,
       fillColor: "#3b82f6",
-      fillOpacity: 0.08,
+      fillOpacity: 0.10,
       map: map,
       center: userLocation,
       radius: 2000
     });
 
+    // lock view back to your Tesla-style angle/zoom
+    map.addListener("zoom_changed", () => {
+      if (isResettingZoom) return;
+
+      const currentZoom = map.getZoom();
+      if (Math.abs(currentZoom - fixedZoom) > 0.01) {
+        isResettingZoom = true;
+        setTimeout(() => {
+          map.setZoom(fixedZoom);
+          isResettingZoom = false;
+        }, 120);
+      }
+    });
+
+    // keep map centered on your 2 km view
+    map.addListener("dragend", () => {
+      map.panTo(userLocation);
+    });
+
     generateNearbyCars(userLocation);
+
     setInterval(() => {
       refreshNearbyCars(userLocation);
+      map.panTo(userLocation);
+      map.setZoom(fixedZoom);
     }, 5000);
   });
 }
@@ -129,8 +134,8 @@ function generateNearbyCars(userLocation) {
   const cars = [];
 
   for (let i = 0; i < 4; i++) {
-    const latOffset = (Math.random() - 0.5) * 0.02;
-    const lngOffset = (Math.random() - 0.5) * 0.02;
+    const latOffset = (Math.random() - 0.5) * 0.018;
+    const lngOffset = (Math.random() - 0.5) * 0.018;
 
     const carPosition = {
       lat: userLocation.lat + latOffset,
@@ -138,25 +143,30 @@ function generateNearbyCars(userLocation) {
     };
 
     const speed = Math.floor(Math.random() * 50) + 30;
-    const direction = Math.floor(Math.random() * 360);
 
     const marker = new google.maps.Marker({
       position: carPosition,
       map: map,
       title: "Nearby Car",
       icon: {
-        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-        scale: 5,
-        fillColor: "#ffffff",
-        fillOpacity: 1,
-        strokeWeight: 1,
-        strokeColor: "#000000",
-        rotation: direction
+        url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 64 64">
+            <g>
+              <path d="M20 18 C22 14, 42 14, 44 18 L48 28 C49 30, 49 34, 48 37 L46 46 C45.5 49, 43 51, 40 51 L24 51 C21 51, 18.5 49, 18 46 L16 37 C15 34, 15 30, 16 28 Z"
+                    fill="#d1d5db" stroke="#000000" stroke-width="2"/>
+              <path d="M23 22 L41 22 L45 31 L19 31 Z" fill="#374151"/>
+              <circle cx="22" cy="46" r="3.2" fill="#0f0f0f"/>
+              <circle cx="42" cy="46" r="3.2" fill="#0f0f0f"/>
+            </g>
+          </svg>
+        `),
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 16)
       }
     });
 
     const infoWindow = new google.maps.InfoWindow({
-      content: `<b>Nearby Car</b><br>Speed: ${speed} km/h<br>Direction: ${direction}°`
+      content: `<b>Nearby Car</b><br>Speed: ${speed} km/h`
     });
 
     marker.addListener("click", () => {
@@ -170,6 +180,3 @@ function generateNearbyCars(userLocation) {
   document.getElementById("carCount").innerText = cars.length;
 }
 </script>
-
-</body>
-</html>
