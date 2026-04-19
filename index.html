@@ -6,24 +6,15 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   />
-  <title>DriveAware</title>
+  <title>DriveAware Live</title>
 
-  <!-- Google Identity -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <!-- Google Maps -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwlPdQ7vByL3E1VlmSb3Xhq0acYuC8590"
-    defer
-  ></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwlPdQ7vByL3E1VlmSb3Xhq0acYuC8590" defer></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       width: 100%;
@@ -34,21 +25,18 @@
       overflow: hidden;
     }
 
-    #app {
+    #loginScreen, #mapScreen {
       width: 100%;
       height: 100%;
-      position: relative;
     }
 
     #loginScreen {
-      width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       background:
-        radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 35%),
-        radial-gradient(circle at bottom, rgba(255, 255, 255, 0.08), transparent 25%),
+        radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 35%),
+        radial-gradient(circle at bottom, rgba(255,255,255,0.08), transparent 25%),
         #000;
       padding: 20px;
     }
@@ -56,46 +44,29 @@
     .login-card {
       width: 100%;
       max-width: 460px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 28px;
       padding: 32px 24px;
       text-align: center;
       backdrop-filter: blur(12px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     }
 
     .logo {
       font-size: 34px;
       font-weight: 700;
-      letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
 
     .subtitle {
-      color: rgba(255, 255, 255, 0.72);
+      color: rgba(255,255,255,0.72);
       font-size: 15px;
       line-height: 1.6;
       margin-bottom: 26px;
     }
 
-    .badge {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.28);
-      color: #93c5fd;
-      font-size: 12px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
     #mapScreen {
       display: none;
-      width: 100%;
-      height: 100%;
       position: relative;
       background: #000;
     }
@@ -112,46 +83,42 @@
       right: 18px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      pointer-events: none;
       z-index: 10;
+      pointer-events: none;
     }
 
     .title-box,
     .status-box,
-    .hud-bottom,
-    .speed-box {
-      background: rgba(0, 0, 0, 0.68);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    .speed-box,
+    .hud-bottom {
+      background: rgba(0,0,0,0.68);
+      border: 1px solid rgba(255,255,255,0.08);
       backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      pointer-events: auto;
     }
 
     .title-box {
       padding: 14px 16px;
       border-radius: 18px;
-      pointer-events: auto;
-      min-width: 190px;
     }
 
     .title-box h1 {
       font-size: 18px;
       margin: 0 0 4px 0;
-      font-weight: 700;
     }
 
     .title-box p {
       margin: 0;
-      color: rgba(255, 255, 255, 0.68);
+      color: rgba(255,255,255,0.68);
       font-size: 13px;
     }
 
     .status-box {
       padding: 12px 14px;
       border-radius: 18px;
-      pointer-events: auto;
       text-align: right;
-      min-width: 150px;
+      min-width: 170px;
     }
 
     .status-live {
@@ -159,11 +126,6 @@
       font-weight: 700;
       font-size: 14px;
       margin-bottom: 6px;
-    }
-
-    .status-box div:last-child {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.68);
     }
 
     .speed-box {
@@ -178,7 +140,7 @@
 
     .speed-label {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.62);
+      color: rgba(255,255,255,0.62);
       margin-bottom: 4px;
     }
 
@@ -190,7 +152,7 @@
 
     .speed-unit {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.62);
+      color: rgba(255,255,255,0.62);
       margin-top: 6px;
     }
 
@@ -201,13 +163,12 @@
       z-index: 10;
       border-radius: 22px;
       padding: 16px;
-      width: min(340px, calc(100vw - 36px));
+      width: min(350px, calc(100vw - 36px));
     }
 
     .hud-bottom h2 {
       margin: 0 0 12px 0;
       font-size: 16px;
-      font-weight: 700;
     }
 
     .hud-grid {
@@ -217,14 +178,14 @@
     }
 
     .hud-item {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255,255,255,0.05);
       border-radius: 14px;
       padding: 10px 12px;
     }
 
     .hud-item-label {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255,255,255,0.6);
       margin-bottom: 4px;
     }
 
@@ -232,128 +193,70 @@
       font-size: 15px;
       font-weight: 700;
     }
-
-    .center-lock {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(59, 130, 246, 0.9);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9;
-      pointer-events: none;
-      box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
-    }
-
-    .center-lock::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 4px;
-      height: 4px;
-      background: #60a5fa;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .note {
-      margin-top: 16px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.55);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 640px) {
-      .hud-top {
-        flex-direction: column;
-        gap: 10px;
-        right: auto;
-      }
-
-      .status-box {
-        text-align: left;
-      }
-
-      .speed-box {
-        top: 170px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div id="app">
-    <div id="loginScreen">
-      <div class="login-card">
-        <div class="badge">DriveAware · Tesla Style MVP</div>
-        <div class="logo">🚗 DriveAware</div>
-        <div class="subtitle">
-          Sign in and open a live dark road map with your car, nearby demo cars,
-          fixed 2 km view, and auto-reset Tesla-style camera.
-        </div>
+  <div id="loginScreen">
+    <div class="login-card">
+      <div class="logo">🚗 DriveAware</div>
+      <div class="subtitle">
+        Sign in and see real nearby users within 2 km.
+      </div>
 
-        <div
-          id="g_id_onload"
-          data-client_id="858177640880-1cpig47vu2utd3rvoo1n4r2ioqto3mar.apps.googleusercontent.com"
-          data-callback="handleCredentialResponse"
-          data-auto_prompt="false"
-        ></div>
+      <div
+        id="g_id_onload"
+        data-client_id="858177640880-1cpig47vu2utd3rvoo1n4r2ioqto3mar.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false"
+      ></div>
 
-        <div class="g_id_signin"></div>
+      <div class="g_id_signin"></div>
+    </div>
+  </div>
 
-        <div class="note">
-          Replace <b>858177640880-1cpig47vu2utd3rvoo1n4r2ioqto3mar.apps.googleusercontent.com</b> and <b>AIzaSyDwlPdQ7vByL3E1VlmSb3Xhq0acYuC8590</b> before deploy.
-        </div>
+  <div id="mapScreen">
+    <div id="map"></div>
+
+    <div class="hud-top">
+      <div class="title-box">
+        <h1>DriveAware</h1>
+        <p>Live nearby vehicle network</p>
+      </div>
+
+      <div class="status-box">
+        <div class="status-live">● LIVE</div>
+        <div id="statusText">Connecting users...</div>
       </div>
     </div>
 
-    <div id="mapScreen">
-      <div id="map"></div>
-      <div class="center-lock"></div>
+    <div class="speed-box">
+      <div class="speed-label">Your speed</div>
+      <div class="speed-value" id="speedValue">0</div>
+      <div class="speed-unit">km/h</div>
+    </div>
 
-      <div class="hud-top">
-        <div class="title-box">
-          <h1>DriveAware</h1>
-          <p>Live road awareness network</p>
+    <div class="hud-bottom">
+      <h2>Nearby vehicles</h2>
+
+      <div class="hud-grid">
+        <div class="hud-item">
+          <div class="hud-item-label">Range</div>
+          <div class="hud-item-value">2 km</div>
         </div>
 
-        <div class="status-box">
-          <div class="status-live">● LIVE</div>
-          <div>Auto lock view enabled</div>
+        <div class="hud-item">
+          <div class="hud-item-label">Refresh</div>
+          <div class="hud-item-value">5 sec</div>
         </div>
-      </div>
 
-      <div class="speed-box">
-        <div class="speed-label">Your speed</div>
-        <div class="speed-value" id="speedValue">0</div>
-        <div class="speed-unit">km/h</div>
-      </div>
+        <div class="hud-item">
+          <div class="hud-item-label">Nearby cars</div>
+          <div class="hud-item-value" id="carCount">0</div>
+        </div>
 
-      <div class="hud-bottom">
-        <h2>Nearby vehicles</h2>
-
-        <div class="hud-grid">
-          <div class="hud-item">
-            <div class="hud-item-label">Range</div>
-            <div class="hud-item-value">2 km</div>
-          </div>
-
-          <div class="hud-item">
-            <div class="hud-item-label">Refresh</div>
-            <div class="hud-item-value">5 sec</div>
-          </div>
-
-          <div class="hud-item">
-            <div class="hud-item-label">Nearby cars</div>
-            <div class="hud-item-value" id="carCount">0</div>
-          </div>
-
-          <div class="hud-item">
-            <div class="hud-item-label">View mode</div>
-            <div class="hud-item-value">Tesla dark</div>
-          </div>
+        <div class="hud-item">
+          <div class="hud-item-label">Mode</div>
+          <div class="hud-item-value">Real users</div>
         </div>
       </div>
     </div>
@@ -362,35 +265,12 @@
   <script>
     let map;
     let userMarker;
-    let radiusCircle;
     let nearbyMarkers = [];
-    let fixedZoom = 15.8;
-    let isResettingZoom = false;
+    let radiusCircle;
+    let userId = "user_" + Math.random().toString(36).slice(2, 10);
     let userLocation = null;
-    let simulatedSpeed = 56;
-
-    function waitForGoogleMaps(callback, retries = 50) {
-      if (window.google && window.google.maps) {
-        callback();
-        return;
-      }
-
-      if (retries <= 0) {
-        alert("Google Maps did not load. Check your API key.");
-        return;
-      }
-
-      setTimeout(() => waitForGoogleMaps(callback, retries - 1), 200);
-    }
-
-    function handleCredentialResponse() {
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("mapScreen").style.display = "block";
-
-      waitForGoogleMaps(() => {
-        initMap();
-      });
-    }
+    let simulatedSpeed = 0;
+    let fixedZoom = 15.8;
 
     function teslaRoadStyle() {
       return [
@@ -400,18 +280,14 @@
         { featureType: "poi", stylers: [{ visibility: "off" }] },
         { featureType: "transit", stylers: [{ visibility: "off" }] },
         { featureType: "administrative", stylers: [{ visibility: "off" }] },
-        { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#05070b" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#030712" }] },
         { featureType: "road", elementType: "geometry", stylers: [{ color: "#1f2937" }] },
-        { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#111827" }] },
-        { featureType: "road.local", elementType: "geometry", stylers: [{ color: "#202833" }] },
-        { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#263241" }] },
-        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3b4758" }] },
-        { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#4b5563" }] }
+        { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#374151" }] },
+        { featureType: "water", elementType: "geometry", stylers: [{ color: "#030712" }] },
+        { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#05070b" }] }
       ];
     }
 
-    function getTeslaCarIcon(fillColor = "#ffffff", strokeColor = "#111111", size = 42) {
+    function getTeslaCarIcon(fillColor = "#ffffff", strokeColor = "#111111", size = 40) {
       return {
         url:
           "data:image/svg+xml;charset=UTF-8," +
@@ -432,6 +308,12 @@
       };
     }
 
+    function handleCredentialResponse() {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("mapScreen").style.display = "block";
+      initMap();
+    }
+
     function kmhFromMetersPerSecond(mps) {
       return Math.round(mps * 3.6);
     }
@@ -442,22 +324,21 @@
 
     function initMap() {
       if (!navigator.geolocation) {
-        alert("Geolocation is not supported in this browser.");
+        alert("Geolocation not supported.");
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const realLat = position.coords.latitude;
-          const realLng = position.coords.longitude;
-
           userLocation = {
-            lat: realLat,
-            lng: realLng
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
           };
 
           if (position.coords.speed !== null && !isNaN(position.coords.speed)) {
             simulatedSpeed = kmhFromMetersPerSecond(position.coords.speed);
+          } else {
+            simulatedSpeed = 48;
           }
 
           updateSpeedBox(simulatedSpeed);
@@ -466,24 +347,10 @@
             center: userLocation,
             zoom: fixedZoom,
             disableDefaultUI: true,
-            zoomControl: false,
-            streetViewControl: false,
-            fullscreenControl: false,
-            mapTypeControl: false,
             clickableIcons: false,
+            zoomControl: false,
             gestureHandling: "greedy",
-            minZoom: 15,
-            maxZoom: 17,
-            styles: teslaRoadStyle(),
-            restriction: {
-              latLngBounds: {
-                north: userLocation.lat + 0.03,
-                south: userLocation.lat - 0.03,
-                east: userLocation.lng + 0.03,
-                west: userLocation.lng - 0.03
-              },
-              strictBounds: false
-            }
+            styles: teslaRoadStyle()
           });
 
           userMarker = new google.maps.Marker({
@@ -505,14 +372,12 @@
             fillOpacity: 0.12
           });
 
-          lockTeslaView();
-          generateNearbyCars(userLocation);
-          startLiveRefresh();
-          startLocationWatch();
+          sendMyLocation();
+          fetchNearbyUsers();
+          startLiveTracking();
         },
-        (error) => {
-          console.error(error);
-          alert("Location permission denied or unavailable.");
+        () => {
+          alert("Location permission denied.");
         },
         {
           enableHighAccuracy: true,
@@ -522,30 +387,76 @@
       );
     }
 
-    function lockTeslaView() {
-      map.addListener("zoom_changed", () => {
-        if (isResettingZoom || !map) return;
-
-        const currentZoom = map.getZoom();
-        if (Math.abs(currentZoom - fixedZoom) > 0.01) {
-          isResettingZoom = true;
-          setTimeout(() => {
-            map.setZoom(fixedZoom);
-            isResettingZoom = false;
-          }, 120);
-        }
-      });
-
-      map.addListener("dragend", () => {
-        if (userLocation) {
-          map.panTo(userLocation);
-        }
-      });
+    function clearNearbyMarkers() {
+      nearbyMarkers.forEach((marker) => marker.setMap(null));
+      nearbyMarkers = [];
     }
 
-    function startLocationWatch() {
-      if (!navigator.geolocation) return;
+    function renderNearbyUsers(users) {
+      clearNearbyMarkers();
 
+      users.forEach((user) => {
+        const marker = new google.maps.Marker({
+          position: { lat: user.lat, lng: user.lng },
+          map: map,
+          title: "Nearby Car",
+          icon: getTeslaCarIcon("#d1d5db", "#000000", 30)
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<b>Nearby Car</b><br>Speed: ${Math.round(user.speed || 0)} km/h<br>Distance: ${user.distanceKm} km`
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.open(map, marker);
+        });
+
+        nearbyMarkers.push(marker);
+      });
+
+      document.getElementById("carCount").innerText = users.length;
+    }
+
+    async function sendMyLocation() {
+      if (!userLocation) return;
+
+      try {
+        await fetch("/api/update-location", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userId,
+            lat: userLocation.lat,
+            lng: userLocation.lng,
+            speed: simulatedSpeed
+          })
+        });
+
+        document.getElementById("statusText").innerText = "Location shared";
+      } catch (error) {
+        document.getElementById("statusText").innerText = "Server offline";
+      }
+    }
+
+    async function fetchNearbyUsers() {
+      if (!userLocation) return;
+
+      try {
+        const response = await fetch(
+          `/api/nearby?userId=${encodeURIComponent(userId)}&lat=${userLocation.lat}&lng=${userLocation.lng}`
+        );
+
+        const data = await response.json();
+        renderNearbyUsers(data.users || []);
+        document.getElementById("statusText").innerText = "Nearby users updated";
+      } catch (error) {
+        document.getElementById("statusText").innerText = "Could not load users";
+      }
+    }
+
+    function startLiveTracking() {
       navigator.geolocation.watchPosition(
         (position) => {
           userLocation = {
@@ -553,26 +464,17 @@
             lng: position.coords.longitude
           };
 
-          if (userMarker) {
-            userMarker.setPosition(userLocation);
-          }
-
-          if (radiusCircle) {
-            radiusCircle.setCenter(userLocation);
-          }
-
-          if (map) {
-            map.panTo(userLocation);
-            map.setZoom(fixedZoom);
-          }
-
           if (position.coords.speed !== null && !isNaN(position.coords.speed)) {
             simulatedSpeed = kmhFromMetersPerSecond(position.coords.speed);
-          } else {
-            simulatedSpeed = 48 + Math.floor(Math.random() * 18);
           }
 
           updateSpeedBox(simulatedSpeed);
+
+          userMarker.setPosition(userLocation);
+          radiusCircle.setCenter(userLocation);
+          map.panTo(userLocation);
+
+          sendMyLocation();
         },
         () => {},
         {
@@ -581,65 +483,10 @@
           maximumAge: 2000
         }
       );
-    }
 
-    function clearNearbyCars() {
-      nearbyMarkers.forEach((marker) => marker.setMap(null));
-      nearbyMarkers = [];
-    }
-
-    function generateNearbyCars(center) {
-      if (!map || !center) return;
-
-      const cars = [];
-
-      for (let i = 0; i < 4; i++) {
-        const latOffset = (Math.random() - 0.5) * 0.018;
-        const lngOffset = (Math.random() - 0.5) * 0.018;
-
-        const carPosition = {
-          lat: center.lat + latOffset,
-          lng: center.lng + lngOffset
-        };
-
-        const speed = 30 + Math.floor(Math.random() * 45);
-
-        const marker = new google.maps.Marker({
-          position: carPosition,
-          map: map,
-          title: "Nearby Car",
-          icon: getTeslaCarIcon("#d1d5db", "#000000", 32)
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-          content: `<b>Nearby Car</b><br>Speed: ${speed} km/h<br>Status: within 2 km`
-        });
-
-        marker.addListener("click", () => {
-          infoWindow.open(map, marker);
-        });
-
-        nearbyMarkers.push(marker);
-        cars.push(marker);
-      }
-
-      document.getElementById("carCount").innerText = cars.length;
-    }
-
-    function refreshNearbyCars() {
-      if (!userLocation) return;
-      clearNearbyCars();
-      generateNearbyCars(userLocation);
-    }
-
-    function startLiveRefresh() {
       setInterval(() => {
-        refreshNearbyCars();
-
-        if (map && userLocation) {
-          map.panTo(userLocation);
-          map.setZoom(fixedZoom);
-        }
+        sendMyLocation();
+        fetchNearbyUsers();
       }, 5000);
     }
   </script>
