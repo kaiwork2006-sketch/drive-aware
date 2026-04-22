@@ -327,7 +327,8 @@
         alert("Geolocation not supported.");
         return;
       }
-
+      
+       startLiveTracking(map);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           userLocation = {
@@ -489,6 +490,72 @@
         fetchNearbyUsers();
       }, 5000);
     }
-  </script>
-</body>
-</html>
+    <script>
+const BACKEND_URL = "https://drive-aware-backend.onrender.com";
+
+let myId = localStorage.getItem("driveaware_id");
+if (!myId) {
+  myId = "user_" + Math.random().toString(36).substring(2, 10);
+  localStorage.setItem("driveaware_id", myId);
+}
+
+let nearbyMarkers = [];
+
+function clearNearbyMarkers() {
+  nearbyMarkers.forEach(marker => marker.setMap(null));
+  nearbyMarkers = [];
+}
+
+async function sendLocation(lat, lng, speed = 0) {
+  await fetch(`${BACKEND_URL}/update-location`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: myId,
+      lat,
+      lng,
+      speed,
+      vehicleType: "car"
+    })
+  });
+}
+
+async function getNearby(lat, lng) {
+  const res = await fetch(`${BACKEND_URL}/nearby?lat=${lat}&lng=${lng}&range=2&id=${myId}`);
+  return await res.json();
+}
+
+async function updateNearbyCars(map, lat, lng) {
+  const users = await getNearby(lat, lng);
+  clearNearbyMarkers();
+
+  users.forEach((u) => {
+    const marker = new google.maps.Marker({
+      position: { lat: u.lat, lng: u.lng },
+      map,
+      icon: "/car-icon.png"
+    });
+    nearbyMarkers.push(marker);
+  });
+
+  const nearbyCountBox = document.getElementById("nearby-count");
+  if (nearbyCountBox) {
+    nearbyCountBox.textContent = users.length;
+  }
+}
+
+function startLiveTracking(map) {
+  setInterval(() => {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const speed = pos.coords.speed || 0;
+
+      await sendLocation(lat, lng, speed);
+      await updateNearbyCars(map, lat, lng);
+    });
+  }, 5000);
+}
+    </script>
